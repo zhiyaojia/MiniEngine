@@ -1,0 +1,6 @@
+.vs
+x64
+*.user
+Debug
+profile.txt
+profile.json

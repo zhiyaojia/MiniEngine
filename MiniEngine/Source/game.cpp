@@ -1,34 +1,26 @@
 #include "stdafx.h"
-#include "Game.h"
+#include "game.h"
 #include "Camera.h"
 #include "engineMath.h"
 #include "Graphics.h"
 #include "jsonUtil.h"
-#include "Profiler.h"
-#include "RenderCube.h"
 #include "Shader.h"
 #include "SkinnedObj.h"
 #include "stringUtil.h"
-#include "texture.h"
-#include "VertexBuffer.h"
-#include "VertexFormats.h"
 #include "rapidjson\include\rapidjson\rapidjson.h"
 #include "rapidjson\include\rapidjson\document.h"
 #include "Components\Character.h"
 #include "Components\CollisionComponent.h"
-#include "Components\FollowCam.h"
+#include "Components\followCam.h"
 #include "Components\ParticleEmitter.h"
-#include "Components\Player.h"
+#include "Components\player.h"
 #include "Components\PointLight.h"
 #include <fstream>
 #include <sstream>
 
-Game::Game()
-    : mCamera(nullptr)
-    , mAssets(&mGraphics)
-    , mLightBuffer(nullptr)
+Game::Game(): mGraphic(Graphics()), mCamera(nullptr), mAssetManager(AssetManager())
 {
-    mJobs.Begin();
+	mJobs.Begin();
 }
 
 Game::~Game()
@@ -37,83 +29,22 @@ Game::~Game()
 
 void Game::Init(HWND hWnd, float width, float height)
 {
-    mGraphics.InitD3D(hWnd, width, height);
-    ParticleEmitter::Init(&mGraphics, &mAssets);
+    mGraphic.InitD3D(hWnd, width, height);
 
-    {   // load the Simple shader
-        D3D11_INPUT_ELEMENT_DESC inputElem[] =
-        {
-            { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT,    0, offsetof(VertexPosColor, pos),   D3D11_INPUT_PER_VERTEX_DATA, 0 },
-            { "COLOR",    0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, offsetof(VertexPosColor, color), D3D11_INPUT_PER_VERTEX_DATA, 0 }
-        };
-        Shader* pShader = new Shader(&mGraphics);
-        pShader->Load(L"Shaders/Mesh.hlsl", inputElem, ARRAY_SIZE(inputElem));
-        mAssets.SetShader(L"Mesh", pShader);
-    }
-    {   // load the BasicMesh shader
-        D3D11_INPUT_ELEMENT_DESC inputElem[] =
-        {
-            { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT,    0, offsetof(VertexPosNormColorUV, pos),   D3D11_INPUT_PER_VERTEX_DATA, 0 },
-            { "NORMAL",   0, DXGI_FORMAT_R32G32B32_FLOAT,    0, offsetof(VertexPosNormColorUV, norm),  D3D11_INPUT_PER_VERTEX_DATA, 0 },
-            { "COLOR",    0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, offsetof(VertexPosNormColorUV, color), D3D11_INPUT_PER_VERTEX_DATA, 0 },
-            { "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT,       0, offsetof(VertexPosNormColorUV, uv),    D3D11_INPUT_PER_VERTEX_DATA, 0 }
-        };
-        Shader* pShader = new Shader(&mGraphics);
-        pShader->Load(L"Shaders/BasicMesh.hlsl", inputElem, ARRAY_SIZE(inputElem));
-        mAssets.SetShader(L"BasicMesh", pShader);
-    }
-    {   // load the Phong and Unlit shaders
-        D3D11_INPUT_ELEMENT_DESC inputElem[] =
-        {
-            { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT,    0, offsetof(VertexPosNormUV, pos),   D3D11_INPUT_PER_VERTEX_DATA, 0 },
-            { "NORMAL",   0, DXGI_FORMAT_R32G32B32_FLOAT,    0, offsetof(VertexPosNormUV, norm),  D3D11_INPUT_PER_VERTEX_DATA, 0 },
-            { "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT,       0, offsetof(VertexPosNormUV, uv),    D3D11_INPUT_PER_VERTEX_DATA, 0 }
-        };
-        Shader* pShader = new Shader(&mGraphics);
-        pShader->Load(L"Shaders/Phong.hlsl", inputElem, ARRAY_SIZE(inputElem));
-        mAssets.SetShader(L"Phong", pShader);
-        pShader = new Shader(&mGraphics);
-        pShader->Load(L"Shaders/Unlit.hlsl", inputElem, ARRAY_SIZE(inputElem));
-        mAssets.SetShader(L"Unlit", pShader);
-    }
-    {   // load the Skinned shader
-        D3D11_INPUT_ELEMENT_DESC inputElem[] =
-        {
-            { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT,    0, offsetof(VertexPosNormSkinUV, pos),         D3D11_INPUT_PER_VERTEX_DATA, 0 },
-            { "NORMAL",   0, DXGI_FORMAT_R32G32B32_FLOAT,    0, offsetof(VertexPosNormSkinUV, norm),        D3D11_INPUT_PER_VERTEX_DATA, 0 },
-            { "BONE",     0, DXGI_FORMAT_R8G8B8A8_UINT,      0, offsetof(VertexPosNormSkinUV, boneIndex),   D3D11_INPUT_PER_VERTEX_DATA, 0 },
-            { "WEIGHT",   0, DXGI_FORMAT_R8G8B8A8_UNORM,     0, offsetof(VertexPosNormSkinUV, boneWeight),  D3D11_INPUT_PER_VERTEX_DATA, 0 },
-            { "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT,       0, offsetof(VertexPosNormSkinUV, uv),          D3D11_INPUT_PER_VERTEX_DATA, 0 }
-        };
-        Shader* pShader = new Shader(&mGraphics);
-        pShader->Load(L"Shaders/Skinned.hlsl", inputElem, ARRAY_SIZE(inputElem));
-        mAssets.SetShader(L"Skinned", pShader);
-    }
-    {   // load the Particle shader
-        D3D11_INPUT_ELEMENT_DESC inputElem[] =
-        {
-            { "POSITION",   0, DXGI_FORMAT_R32G32B32_FLOAT, 0, offsetof(VertexPosUV, pos),                               D3D11_INPUT_PER_VERTEX_DATA,    0 },
-            { "TEXCOORD",   0, DXGI_FORMAT_R32G32_FLOAT,    0, offsetof(VertexPosUV, uv),                                D3D11_INPUT_PER_VERTEX_DATA,    0 },
-            { "POSITION",   1, DXGI_FORMAT_R32G32B32_FLOAT, 1, offsetof(ParticleEmitter::PerParticleRenderData, pos),    D3D11_INPUT_PER_INSTANCE_DATA,  1 },
-            { "SIZE",       0, DXGI_FORMAT_R32_FLOAT,       1, offsetof(ParticleEmitter::PerParticleRenderData, size),   D3D11_INPUT_PER_INSTANCE_DATA,  1 },
-            { "ALPHA",      0, DXGI_FORMAT_R32_FLOAT,       1, offsetof(ParticleEmitter::PerParticleRenderData, alpha),  D3D11_INPUT_PER_INSTANCE_DATA,  1 }
-        };
-        Shader* pShader = new Shader(&mGraphics);
-        pShader->Load(L"Shaders/Particle.hlsl", inputElem, ARRAY_SIZE(inputElem));
-        mAssets.SetShader(L"Particle", pShader);
-    }
+    Shader::LoadAllShader(&mAssetManager);
 
-    mCamera = new Camera(&mGraphics);
-    mLightBuffer = mGraphics.CreateGraphicsBuffer(&mLightData, sizeof(mLightData), D3D11_BIND_CONSTANT_BUFFER, D3D11_CPU_ACCESS_WRITE, D3D11_USAGE_DYNAMIC);
+    mCamera = new Camera(&mGraphic);
+    mLightBuffer = mGraphic.CreateGraphicsBuffer
+		(&mLightData, sizeof(mLightData), D3D11_BIND_CONSTANT_BUFFER, D3D11_CPU_ACCESS_WRITE, D3D11_USAGE_DYNAMIC);
 
-    LoadLevel(L"Assets/Levels/Particle.itplevel");
+    LoadLevel(L"Assets/Levels/Level08.itplevel");
 }
 
 void Game::Shutdown()
 {
     mJobs.End();
 
-    ParticleEmitter::Shutdown();
+    //ParticleEmitter::Shutdown();
 
     delete mCamera;
     for (RenderObj* pObj : mRenderObj)
@@ -121,9 +52,9 @@ void Game::Shutdown()
 
     mLightBuffer->Release();
 
-    mAssets.Clear();
+    mAssetManager.Clear();
 
-    mGraphics.CleanD3D();
+    mGraphic.CleanD3D();
 }
 
 void Game::Update(float deltaTime)
@@ -143,14 +74,15 @@ void Game::RenderFrame()
         //PROFILE_SCOPE(BeginFrame);
         // Clear the screen to blue
         Graphics::Color4 clearColor(0.0f, 0.2f, 0.4f, 1.0f);
-        mGraphics.BeginFrame(clearColor);
+        mGraphic.BeginFrame(clearColor);
     }
+
+    mCamera->SetActive();
 
     {
         //PROFILE_SCOPE(SetLighting);
-        mCamera->SetActive();
-        mGraphics.UploadBuffer(mLightBuffer, &mLightData, sizeof(mLightData));
-        mGraphics.GetDeviceContext()->PSSetConstantBuffers(Graphics::CONSTANT_BUFFER_LIGHTING, 1, &mLightBuffer);
+        mGraphic.UploadBuffer(mLightBuffer, &mLightData, sizeof(mLightData));
+        mGraphic.GetDeviceContext()->PSSetConstantBuffers(Graphics::CONSTANT_BUFFER_LIGHTING, 1, &mLightBuffer);
     }
 
     {
@@ -160,17 +92,17 @@ void Game::RenderFrame()
             pObj->Draw();
     }
 
-    mGraphics.BeginAlpha();
-    {
-        //PROFILE_SCOPE(RenderParticles);
-        // Draw the Particles
-        ParticleEmitter::RenderAll();
-    }
+    //mGraphic.BeginAlpha();
+    //{
+    //    //PROFILE_SCOPE(RenderParticles);
+    //    // Draw the Particles
+    //    ParticleEmitter::RenderAll();
+    //}
 
     {
         //PROFILE_SCOPE(EndFrame);
         // Done with this frame
-        mGraphics.EndFrame(0, 0);
+        mGraphic.EndFrame(1, 0);
     }
 }
 
@@ -192,23 +124,33 @@ bool Game::IsKeyHeld(uint32_t key) const
 	return false;
 }
 
-Game::PointLightData* Game::AllocateLight()
+Light::PointLightData* Game::AllocateLight()
 {
-    for (int i = 0; i < MAX_POINT_LIGHTS; ++i)
+    for (int i = 0; i < Light::numPointLight; i++)
     {
-        if (false == mLightData.c_pointLight[i].isEnabled)
+        if (!mLightData.pointLightArray[i].isEnabled)
         {
-            mLightData.c_pointLight[i].isEnabled = true;
-            return &mLightData.c_pointLight[i];
+            mLightData.pointLightArray[i].isEnabled = true;
+            return &(mLightData.pointLightArray[i]);
         }
     }
     return nullptr;
+
 }
 
-void Game::FreeLight(PointLightData* pLight)
+void Game::FreeLight(Light::PointLightData* pLight)
 {
-    DbgAssert(pLight->isEnabled, "Don't try to free a light that isn't enabled");
     pLight->isEnabled = false;
+}
+
+void Game::SetAmbientLight(const Vector3& color)
+{
+    mLightData.ambientLight = color;
+}
+
+const Vector3& Game::GetAmbientLight() const
+{
+    return mLightData.ambientLight;
 }
 
 bool Game::LoadLevel(const WCHAR* fileName)
@@ -280,19 +222,19 @@ bool Game::LoadLevel(const WCHAR* fileName)
                 GetFloatFromJSON(obj, "scale", scale);
                 std::wstring mesh;
                 GetWStringFromJSON(obj, "mesh", mesh);
-                Mesh* pMesh = mAssets.LoadMesh(mesh);
+                Mesh* pMesh = mAssetManager.LoadMesh(mesh);
                 RenderObj* pObj = nullptr;
                 SkinnedObj* pSkin = nullptr;
                 if ((nullptr != pMesh) && (pMesh->IsSkinned()))
                 {
-                    pSkin = new SkinnedObj(&mGraphics, pMesh);
+                    pSkin = new SkinnedObj(pMesh);
                     pObj = pSkin;
                 }
                 else
                 {
-                    pObj = new RenderObj(&mGraphics, pMesh);
+                    pObj = new RenderObj(pMesh);
                 }
-                pObj->mObjectData.c_modelToWorld =
+                pObj->mObjectData.modelToWorld =
                     Matrix4::CreateScale(scale)
                     * Matrix4::CreateFromQuaternion(rot)
                     * Matrix4::CreateTranslation(pos);
@@ -322,7 +264,7 @@ bool Game::LoadLevel(const WCHAR* fileName)
                         {
                             pComp = new FollowCam(this, pObj);
                         }
-                        else if (type == "Collision")
+                        else if (type == "CollisionBox")
                         {
                             pComp = new CollisionComponent(&mPhysics, pObj);
                         }

@@ -8,18 +8,17 @@ class Animation
 {
 public:
     Animation();
-    uint32_t GetNumBones() const { return mNumBones; }
-    uint32_t GetNumFrames() const { return mNumFrames; }
-    float GetLength() const { return mLength; }
     static Animation* StaticLoad(const WCHAR* fileName, AssetManager* pAssetManager);
     bool Load(const WCHAR* fileName);
-    void GetGlobalPoseAtTime(
-        std::vector<Matrix4>& outPoses, const Skeleton *inSkeleton, float inTime
-    ) const;
+    void GetGlobalPoseAtTime(std::vector<Matrix4>& outPoses, const Skeleton *inSkeleton, float inTime) const;
+
+    uint32_t GetNumBones() const { return mBoneNum; }
+    uint32_t GetNumFrames() const { return mFrameNum; }
+    float GetLength() const { return mLength; }
 
 private:
-    uint32_t mNumBones;
-    uint32_t mNumFrames;
+    uint32_t mBoneNum;
+    uint32_t mFrameNum;
     float mLength;
     std::vector<std::vector<BoneTransform>> mTracks;
 };

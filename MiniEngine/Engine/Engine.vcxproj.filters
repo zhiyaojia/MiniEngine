@@ -8,6 +8,9 @@
     <Filter Include="Source Files\Components">
       <UniqueIdentifier>{6b0ea3d7-aed2-46d7-bd05-2287fbca4734}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\EngineMath">
+      <UniqueIdentifier>{48fe1e48-39b4-471d-9daf-af1b098d4d83}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Graphics.cpp">
@@ -19,12 +22,6 @@
     <ClCompile Include="Shader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="simdMath.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="simdMath_UnitTest.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="stdafx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -32,12 +29,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="DbgAssert.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="engineMath.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="engineMath_UnitTest.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="engineMemory.cpp">
@@ -94,15 +85,21 @@
     <ClCompile Include="ComputeShader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="engineMath.cpp">
+      <Filter>Source Files\EngineMath</Filter>
+    </ClCompile>
+    <ClCompile Include="simdMath.cpp">
+      <Filter>Source Files\EngineMath</Filter>
+    </ClCompile>
+    <ClCompile Include="Material.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="assetCache.h">
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="DbgAssert.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engineMath.h">
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="engineMemory.h">
@@ -115,9 +112,6 @@
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="Shader.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="simdMath.h">
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="stdafx.h">
@@ -184,6 +178,18 @@
       <Filter>Source Files\Components</Filter>
     </ClInclude>
     <ClInclude Include="ComputeShader.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="engineMath.h">
+      <Filter>Source Files\EngineMath</Filter>
+    </ClInclude>
+    <ClInclude Include="simdMath.h">
+      <Filter>Source Files\EngineMath</Filter>
+    </ClInclude>
+    <ClInclude Include="Material.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Light.h">
       <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>

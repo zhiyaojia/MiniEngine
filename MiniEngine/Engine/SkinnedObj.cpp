@@ -2,9 +2,7 @@
 #include "SkinnedObj.h"
 #include "Graphics.h"
 
-
-SkinnedObj::SkinnedObj(Graphics* graphics, const Mesh* pMesh)
-    : RenderObj(graphics, pMesh)
+SkinnedObj::SkinnedObj(const Mesh* pMesh): RenderObj(pMesh)
 {
     for (int i = 0; i < MAX_SKELETON_BONES; ++i)
     {

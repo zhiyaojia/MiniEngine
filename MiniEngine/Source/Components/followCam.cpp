@@ -11,7 +11,7 @@ FollowCam::FollowCam(Game* pGame, RenderObj* pObj)
     : mGame(pGame)
     , Component(pObj)
 {
-	Matrix4 mat = mObj->mObjectData.c_modelToWorld;
+	Matrix4 mat = mObj->mObjectData.modelToWorld;
 	mat = Matrix4::CreateRotationX(Math::PiOver2) * mat;	//mrwTODO this 90 rotation accounts for the orientation of the model :(
 }
 
@@ -24,7 +24,7 @@ void FollowCam::LoadProperties(const rapidjson::Value& properties)
 void FollowCam::Update(float deltaTime)
 {
     Camera* pCamera = mGame->GetCamera();
-    Matrix4 mat = Matrix4::CreateTranslation(mObj->mObjectData.c_modelToWorld.GetTranslation() + mOffset);
+    Matrix4 mat = Matrix4::CreateTranslation(mObj->mObjectData.modelToWorld.GetTranslation() + mOffset);
     mat.Invert();
     pCamera->mView = mat;
 }

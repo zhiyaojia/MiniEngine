@@ -5,22 +5,21 @@
 #include "mesh.h"
 
 
-RenderObj::RenderObj(Graphics* graphics, const Mesh* pMesh)
-    : mGraphics(graphics)
-    , mMesh(pMesh)
+RenderObj::RenderObj(const Mesh* pMesh): mMesh(pMesh)
 {
-    mObjectData.c_modelToWorld = Matrix4::CreateRotationZ(Math::ToRadians(45.0f));
+    mGraphics = Graphics::Get();
+    mObjectData.modelToWorld = Matrix4::CreateRotationZ(Math::ToRadians(45.0f));
     mObjectBuffer = mGraphics->CreateGraphicsBuffer(&mObjectData, sizeof(mObjectData), D3D11_BIND_CONSTANT_BUFFER, D3D11_CPU_ACCESS_WRITE, D3D11_USAGE_DYNAMIC); 
 }
 
-/*virtual*/ RenderObj::~RenderObj()
+RenderObj::~RenderObj()
 {
     mObjectBuffer->Release();
 }
 
-/*virtual*/ void RenderObj::Draw()
+void RenderObj::Draw()
 {
-    if (nullptr != mMesh)
+    if (mMesh)
     {
         mGraphics->UploadBuffer(mObjectBuffer, &mObjectData, sizeof(mObjectData));
         mGraphics->GetDeviceContext()->VSSetConstantBuffers(Graphics::CONSTANT_BUFFER_RENDEROBJ, 1, &mObjectBuffer);
@@ -28,7 +27,7 @@ RenderObj::RenderObj(Graphics* graphics, const Mesh* pMesh)
     }
 }
 
-/*virtual*/ void RenderObj::Update(float deltaTime)
+void RenderObj::Update(float deltaTime)
 {
     for (Component* pComp : mComponents)
     {

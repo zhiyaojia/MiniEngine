@@ -38,5 +38,5 @@ protected:
     private:
         Character* mChar;
     } mAnimJob;
-    void DoAnimation();
+    void DoAnimation() const;
 };

@@ -1,11 +1,5 @@
 #include "Constants.hlsl"
 
-#define MAX_SKELETON_BONES 80
-cbuffer SkinConstants : register(b3)
-{
-    float4x4 c_skinMatrix[MAX_SKELETON_BONES];
-};
-
 struct VIn
 {
     float3 position : POSITION0;
@@ -27,11 +21,11 @@ VOut VS(VIn vIn)
 {
     VOut output;
 
-    float4 inPos = float4(vIn.position, 1.0);
-    float4 pos = mul(inPos, c_skinMatrix[vIn.boneIndex.x]) * vIn.boneWeight.x
-        + mul(inPos, c_skinMatrix[vIn.boneIndex.y]) * vIn.boneWeight.y
-        + mul(inPos, c_skinMatrix[vIn.boneIndex.z]) * vIn.boneWeight.z
-        + mul(inPos, c_skinMatrix[vIn.boneIndex.w]) * vIn.boneWeight.w;
+	const float4 inPos = float4(vIn.position, 1.0);
+    const float4 pos = mul(inPos, c_skinMatrix[vIn.boneIndex.x]) * vIn.boneWeight.x +
+				 mul(inPos, c_skinMatrix[vIn.boneIndex.y]) * vIn.boneWeight.y + 
+				 mul(inPos, c_skinMatrix[vIn.boneIndex.z]) * vIn.boneWeight.z + 
+				 mul(inPos, c_skinMatrix[vIn.boneIndex.w]) * vIn.boneWeight.w;
     output.worldPos = mul(pos, c_modelToWorld);
     output.position = mul(output.worldPos, c_viewProj);
     float4 inNorm = float4(vIn.normal, 0.0);
@@ -63,11 +57,11 @@ float4 PS(VOut pIn) : SV_TARGET
             {
                 l = l / dist;
                 float falloff = smoothstep(c_pointLight[i].outerRadius, c_pointLight[i].innerRadius, dist);
-                float3 d = falloff * c_pointLight[i].diffuseColor * max(0.0, dot(l, n));
+                float3 d = falloff * c_pointLight[i].lightColor * max(0.0, dot(l, n));
                 lightColor += d;
 
                 float3 r = -reflect(l, n);
-                float3 s = falloff * c_pointLight[i].specularColor * pow(max(0.0, dot(r, v)), c_pointLight[i].specularPower);
+                float3 s = falloff * c_specularColor * pow(max(0.0, dot(r, v)), c_specularPower);
                 lightColor += s;
             }
         }

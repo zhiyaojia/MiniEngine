@@ -177,6 +177,7 @@
     <ClInclude Include="Source\Resource.h" />
     <ClInclude Include="Source\stdafx.h" />
     <ClInclude Include="Source\targetver.h" />
+    <ClInclude Include="Source\Test.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Source\Game.rc" />
@@ -198,6 +199,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="Source\Test.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Shaders\BasicMesh.hlsl">

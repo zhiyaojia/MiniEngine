@@ -73,7 +73,7 @@ void Character::UpdateAnim(float deltaTime)
     }
 }
 
-void Character::DoAnimation()
+void Character::DoAnimation() const
 {
     if (nullptr != mCurrentAnim && nullptr != mSkeleton && nullptr != mSkinnedObj)
     {

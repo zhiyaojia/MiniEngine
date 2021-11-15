@@ -5,38 +5,37 @@
 #include "VertexBuffer.h"
 #include "VertexFormats.h"
 
-
-static VertexPosNormColorUV cubeVertex[] =
+static VertexFormat::VertexPosNormalColorUV cubeVertex[] =
 {
-    { Vector3(-0.5f,  0.5f, -0.5f),	Vector3( 0.0f,  0.0f, -1.0f), Graphics::Color4(1.0f, 0.0f, 0.0f, 1.0f),   Vector2(0.0f, 0.0f) },
-    { Vector3( 0.5f,  0.5f, -0.5f),	Vector3( 0.0f,  0.0f, -1.0f), Graphics::Color4(1.0f, 0.0f, 0.0f, 1.0f),   Vector2(1.0f, 0.0f) },
-    { Vector3( 0.5f, -0.5f, -0.5f),	Vector3( 0.0f,  0.0f, -1.0f), Graphics::Color4(1.0f, 0.0f, 0.0f, 1.0f),   Vector2(1.0f, 1.0f) },
-    { Vector3(-0.5f, -0.5f, -0.5f),	Vector3( 0.0f,  0.0f, -1.0f), Graphics::Color4(1.0f, 0.0f, 0.0f, 1.0f),   Vector2(0.0f, 1.0f) },
-                                                    
-    { Vector3( 0.5f,  0.5f, -0.5f),	Vector3( 1.0f,  0.0f,  0.0f), Graphics::Color4(0.0f, 1.0f, 0.0f, 1.0f),   Vector2(0.0f, 0.0f) },
-    { Vector3( 0.5f,  0.5f,  0.5f),	Vector3( 1.0f,  0.0f,  0.0f), Graphics::Color4(0.0f, 1.0f, 0.0f, 1.0f),   Vector2(1.0f, 0.0f) },
-    { Vector3( 0.5f, -0.5f,  0.5f),	Vector3( 1.0f,  0.0f,  0.0f), Graphics::Color4(0.0f, 1.0f, 0.0f, 1.0f),   Vector2(1.0f, 1.0f) },
-    { Vector3( 0.5f, -0.5f, -0.5f),	Vector3( 1.0f,  0.0f,  0.0f), Graphics::Color4(0.0f, 1.0f, 0.0f, 1.0f),   Vector2(0.0f, 1.0f) },
-                                                           
-    { Vector3(-0.5f, -0.5f,  0.5f),	Vector3( 0.0f,  0.0f,  1.0f), Graphics::Color4(0.0f, 0.0f, 1.0f, 1.0f),   Vector2(0.0f, 0.0f) },
-    { Vector3( 0.5f, -0.5f,  0.5f),	Vector3( 0.0f,  0.0f,  1.0f), Graphics::Color4(0.0f, 0.0f, 1.0f, 1.0f),   Vector2(1.0f, 0.0f) },
-    { Vector3( 0.5f,  0.5f,  0.5f),	Vector3( 0.0f,  0.0f,  1.0f), Graphics::Color4(0.0f, 0.0f, 1.0f, 1.0f),   Vector2(1.0f, 1.0f) },
-    { Vector3(-0.5f,  0.5f,  0.5f),	Vector3( 0.0f,  0.0f,  1.0f), Graphics::Color4(0.0f, 0.0f, 1.0f, 1.0f),   Vector2(0.0f, 1.0f) },
-                                                           
-    { Vector3(-0.5f, -0.5f, -0.5f),	Vector3(-1.0f,  0.0f,  0.0f), Graphics::Color4(1.0f, 1.0f, 0.0f, 1.0f),   Vector2(0.0f, 0.0f) },
-    { Vector3(-0.5f, -0.5f,  0.5f),	Vector3(-1.0f,  0.0f,  0.0f), Graphics::Color4(1.0f, 1.0f, 0.0f, 1.0f),   Vector2(1.0f, 0.0f) },
-    { Vector3(-0.5f,  0.5f,  0.5f),	Vector3(-1.0f,  0.0f,  0.0f), Graphics::Color4(1.0f, 1.0f, 0.0f, 1.0f),   Vector2(1.0f, 1.0f) },
-    { Vector3(-0.5f,  0.5f, -0.5f),	Vector3(-1.0f,  0.0f,  0.0f), Graphics::Color4(1.0f, 1.0f, 0.0f, 1.0f),   Vector2(0.0f, 1.0f) },
+	{ Vector3(-0.5f,  0.5f, -0.5f),	Vector3(0.0f,  0.0f, -1.0f), Graphics::Color4(1.0f, 0.0f, 0.0f, 1.0f),   Vector2(0.0f, 0.0f) },
+	{ Vector3(0.5f,  0.5f, -0.5f),	Vector3(0.0f,  0.0f, -1.0f), Graphics::Color4(1.0f, 0.0f, 0.0f, 1.0f),   Vector2(1.0f, 0.0f) },
+	{ Vector3(0.5f, -0.5f, -0.5f),	Vector3(0.0f,  0.0f, -1.0f), Graphics::Color4(1.0f, 0.0f, 0.0f, 1.0f),   Vector2(1.0f, 1.0f) },
+	{ Vector3(-0.5f, -0.5f, -0.5f),	Vector3(0.0f,  0.0f, -1.0f), Graphics::Color4(1.0f, 0.0f, 0.0f, 1.0f),   Vector2(0.0f, 1.0f) },
 
-    { Vector3(-0.5f, -0.5f, -0.5f),	Vector3( 0.0f, -1.0f,  0.0f), Graphics::Color4(0.0f, 1.0f, 1.0f, 1.0f),   Vector2(0.0f, 0.0f) },
-    { Vector3( 0.5f, -0.5f, -0.5f),	Vector3( 0.0f, -1.0f,  0.0f), Graphics::Color4(0.0f, 1.0f, 1.0f, 1.0f),   Vector2(1.0f, 0.0f) },
-    { Vector3( 0.5f, -0.5f,  0.5f),	Vector3( 0.0f, -1.0f,  0.0f), Graphics::Color4(0.0f, 1.0f, 1.0f, 1.0f),   Vector2(1.0f, 1.0f) },
-    { Vector3(-0.5f, -0.5f,  0.5f),	Vector3( 0.0f, -1.0f,  0.0f), Graphics::Color4(0.0f, 1.0f, 1.0f, 1.0f),   Vector2(0.0f, 1.0f) },
-                                             
-    { Vector3(-0.5f,  0.5f,  0.5f),	Vector3( 0.0f,  1.0f,  0.0f), Graphics::Color4(1.0f, 0.0f, 1.0f, 1.0f),   Vector2(0.0f, 0.0f) },
-    { Vector3( 0.5f,  0.5f,  0.5f),	Vector3( 0.0f,  1.0f,  0.0f), Graphics::Color4(1.0f, 0.0f, 1.0f, 1.0f),   Vector2(1.0f, 0.0f) },
-    { Vector3( 0.5f,  0.5f, -0.5f),	Vector3( 0.0f,  1.0f,  0.0f), Graphics::Color4(1.0f, 0.0f, 1.0f, 1.0f),   Vector2(1.0f, 1.0f) },
-    { Vector3(-0.5f,  0.5f, -0.5f),	Vector3( 0.0f,  1.0f,  0.0f), Graphics::Color4(1.0f, 0.0f, 1.0f, 1.0f),   Vector2(0.0f, 1.0f) },
+	{ Vector3(0.5f,  0.5f, -0.5f),	Vector3(1.0f,  0.0f,  0.0f), Graphics::Color4(0.0f, 1.0f, 0.0f, 1.0f),   Vector2(0.0f, 0.0f) },
+	{ Vector3(0.5f,  0.5f,  0.5f),	Vector3(1.0f,  0.0f,  0.0f), Graphics::Color4(0.0f, 1.0f, 0.0f, 1.0f),   Vector2(1.0f, 0.0f) },
+	{ Vector3(0.5f, -0.5f,  0.5f),	Vector3(1.0f,  0.0f,  0.0f), Graphics::Color4(0.0f, 1.0f, 0.0f, 1.0f),   Vector2(1.0f, 1.0f) },
+	{ Vector3(0.5f, -0.5f, -0.5f),	Vector3(1.0f,  0.0f,  0.0f), Graphics::Color4(0.0f, 1.0f, 0.0f, 1.0f),   Vector2(0.0f, 1.0f) },
+
+	{ Vector3(-0.5f, -0.5f,  0.5f),	Vector3(0.0f,  0.0f,  1.0f), Graphics::Color4(0.0f, 0.0f, 1.0f, 1.0f),   Vector2(0.0f, 0.0f) },
+	{ Vector3(0.5f, -0.5f,  0.5f),	Vector3(0.0f,  0.0f,  1.0f), Graphics::Color4(0.0f, 0.0f, 1.0f, 1.0f),   Vector2(1.0f, 0.0f) },
+	{ Vector3(0.5f,  0.5f,  0.5f),	Vector3(0.0f,  0.0f,  1.0f), Graphics::Color4(0.0f, 0.0f, 1.0f, 1.0f),   Vector2(1.0f, 1.0f) },
+	{ Vector3(-0.5f,  0.5f,  0.5f),	Vector3(0.0f,  0.0f,  1.0f), Graphics::Color4(0.0f, 0.0f, 1.0f, 1.0f),   Vector2(0.0f, 1.0f) },
+
+	{ Vector3(-0.5f, -0.5f, -0.5f),	Vector3(-1.0f,  0.0f,  0.0f), Graphics::Color4(1.0f, 1.0f, 0.0f, 1.0f),   Vector2(0.0f, 0.0f) },
+	{ Vector3(-0.5f, -0.5f,  0.5f),	Vector3(-1.0f,  0.0f,  0.0f), Graphics::Color4(1.0f, 1.0f, 0.0f, 1.0f),   Vector2(1.0f, 0.0f) },
+	{ Vector3(-0.5f,  0.5f,  0.5f),	Vector3(-1.0f,  0.0f,  0.0f), Graphics::Color4(1.0f, 1.0f, 0.0f, 1.0f),   Vector2(1.0f, 1.0f) },
+	{ Vector3(-0.5f,  0.5f, -0.5f),	Vector3(-1.0f,  0.0f,  0.0f), Graphics::Color4(1.0f, 1.0f, 0.0f, 1.0f),   Vector2(0.0f, 1.0f) },
+
+	{ Vector3(-0.5f, -0.5f, -0.5f),	Vector3(0.0f, -1.0f,  0.0f), Graphics::Color4(0.0f, 1.0f, 1.0f, 1.0f),   Vector2(0.0f, 0.0f) },
+	{ Vector3(0.5f, -0.5f, -0.5f),	Vector3(0.0f, -1.0f,  0.0f), Graphics::Color4(0.0f, 1.0f, 1.0f, 1.0f),   Vector2(1.0f, 0.0f) },
+	{ Vector3(0.5f, -0.5f,  0.5f),	Vector3(0.0f, -1.0f,  0.0f), Graphics::Color4(0.0f, 1.0f, 1.0f, 1.0f),   Vector2(1.0f, 1.0f) },
+	{ Vector3(-0.5f, -0.5f,  0.5f),	Vector3(0.0f, -1.0f,  0.0f), Graphics::Color4(0.0f, 1.0f, 1.0f, 1.0f),   Vector2(0.0f, 1.0f) },
+
+	{ Vector3(-0.5f,  0.5f,  0.5f),	Vector3(0.0f,  1.0f,  0.0f), Graphics::Color4(1.0f, 0.0f, 1.0f, 1.0f),   Vector2(0.0f, 0.0f) },
+	{ Vector3(0.5f,  0.5f,  0.5f),	Vector3(0.0f,  1.0f,  0.0f), Graphics::Color4(1.0f, 0.0f, 1.0f, 1.0f),   Vector2(1.0f, 0.0f) },
+	{ Vector3(0.5f,  0.5f, -0.5f),	Vector3(0.0f,  1.0f,  0.0f), Graphics::Color4(1.0f, 0.0f, 1.0f, 1.0f),   Vector2(1.0f, 1.0f) },
+	{ Vector3(-0.5f,  0.5f, -0.5f),	Vector3(0.0f,  1.0f,  0.0f), Graphics::Color4(1.0f, 0.0f, 1.0f, 1.0f),   Vector2(0.0f, 1.0f) }
 };
 
 static uint16_t cubeIndex[] =
@@ -60,17 +59,18 @@ static uint16_t cubeIndex[] =
     23, 22, 20,
 };
 
-
-RenderCube::RenderCube(AssetManager* pAssetManager, const Shader* pShader, const Texture* pTex)
-    : RenderObj(pAssetManager->GetGraphics(), nullptr)
+RenderCube::RenderCube(Material* material)
+    : RenderObj(nullptr)
 {
-    VertexBuffer* pVert = new VertexBuffer(mGraphics,
-        cubeVertex, ARRAY_SIZE(cubeVertex), sizeof(cubeVertex[0]),
-        cubeIndex, ARRAY_SIZE(cubeIndex), sizeof(cubeIndex[0])
-        );
-    Mesh* pMesh = new Mesh(pAssetManager, pVert, pShader);
-    pMesh->SetTexture(Graphics::TEXTURE_SLOT_DIFFUSE, pTex);
-    mMesh = pMesh;
+    mMesh = new Mesh
+	(
+        new VertexBuffer
+        (
+            cubeVertex, ARRAY_SIZE(cubeVertex), sizeof(VertexFormat::VertexPosNormalColorUV),
+            cubeIndex, ARRAY_SIZE(cubeIndex), sizeof(uint16_t)
+        ),
+        material
+    );
 }
 
 RenderCube::~RenderCube()

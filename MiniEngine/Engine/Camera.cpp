@@ -5,11 +5,14 @@
 Camera::Camera(Graphics* pGraphics)
     : mGraphics(pGraphics)
 {
-    mView = Matrix4::CreateTranslation(Vector3(0.0f, 0.0f, -100.f));
-    mProj = Matrix4::CreateRotationY(-Math::PiOver2) * Matrix4::CreateRotationZ(-Math::PiOver2) * Matrix4::CreatePerspectiveFOV(Math::ToRadians(70.0f),
-        mGraphics->GetScreenWidth(), mGraphics->GetScreenHeight(),
-        25.0f, 10000.0f);
-    mCameraBuffer = mGraphics->CreateGraphicsBuffer(&mCameraData, sizeof(mCameraData), D3D11_BIND_CONSTANT_BUFFER, D3D11_CPU_ACCESS_WRITE, D3D11_USAGE_DYNAMIC);
+    mView = Matrix4::CreateTranslation(Vector3(500.0f, 0.0f, 0.0f));
+
+    mProj = Matrix4::CreateRotationY(-Math::PiOver2) * 
+        Matrix4::CreateRotationZ(-Math::PiOver2) * 
+        Matrix4::CreatePerspectiveFOV(Math::ToRadians(70.0f), mGraphics->GetScreenWidth(), mGraphics->GetScreenHeight(),25.0f, 10000.0f);
+
+	mCameraBuffer = mGraphics->CreateGraphicsBuffer
+		(&mCameraData, sizeof(mCameraData), D3D11_BIND_CONSTANT_BUFFER, D3D11_CPU_ACCESS_WRITE, D3D11_USAGE_DYNAMIC);
 }
 
 /*virtual*/ Camera::~Camera()

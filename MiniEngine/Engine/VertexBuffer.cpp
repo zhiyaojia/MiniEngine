@@ -2,14 +2,15 @@
 #include "VertexBuffer.h"
 #include "Graphics.h"
 
-VertexBuffer::VertexBuffer(Graphics* graphics,
+VertexBuffer::VertexBuffer
+(
     const void* vertexData, uint32_t vertexCount, uint32_t vertexStride,
     const void* indexData, uint32_t indexCount, uint32_t indexStride
 )
     : mVertStride(vertexStride)
     , mIndexCount(indexCount)
-    , mGraphics(graphics)
 {
+    mGraphics = Graphics::Get();
     mVertexBuffer = mGraphics->CreateGraphicsBuffer(vertexData, vertexCount * vertexStride, D3D11_BIND_VERTEX_BUFFER, D3D11_CPU_ACCESS_WRITE, D3D11_USAGE_DYNAMIC);
     mIndexBuffer = mGraphics->CreateGraphicsBuffer(indexData, indexCount * indexStride, D3D11_BIND_INDEX_BUFFER, D3D11_CPU_ACCESS_WRITE, D3D11_USAGE_DYNAMIC);
     if (indexStride == 1)

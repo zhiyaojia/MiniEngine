@@ -10,10 +10,10 @@ class RenderObj
 public:
     struct PerObjectConstants
     {
-        Matrix4 c_modelToWorld;
+        Matrix4 modelToWorld;
     };
 
-    RenderObj(Graphics* graphics, const Mesh* pMesh);
+    RenderObj(const Mesh* pMesh);
     virtual ~RenderObj();
     virtual void Draw();
     virtual void Update(float deltaTime);

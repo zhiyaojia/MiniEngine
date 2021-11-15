@@ -6,7 +6,7 @@ class Graphics;
 class Texture
 {
 public:
-    Texture(Graphics *graphics);
+    Texture();
     ~Texture();
     
     void Free();

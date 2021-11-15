@@ -5,13 +5,13 @@
 #include "DirectXTK\Inc\WICTextureLoader.h"
 #include <string>
 
-Texture::Texture(Graphics *graphics)
-    : mGraphics(graphics)
-    , mResource(nullptr)
+Texture::Texture()
+    : mResource(nullptr)
     , mView(nullptr)
     , mWidth(0)
     , mHeight(0)
 {
+    mGraphics = Graphics::Get();
 }
 
 Texture::~Texture()
@@ -39,7 +39,7 @@ bool Texture::Load(const WCHAR* fileName)
 {
     Free();     // in case there was already a texture loaded here, release it
 
-    ID3D11Device *pDev = mGraphics->GetDevice();
+    ID3D11Device* pDev = Graphics::Get()->GetDevice();
 
     std::wstring fileStr(fileName);
     std::wstring extension = fileStr.substr(fileStr.find_last_of('.'));
@@ -62,7 +62,7 @@ bool Texture::Load(const WCHAR* fileName)
 
 Texture* Texture::StaticLoad(const WCHAR* fileName, AssetManager* pManager)
 {
-    Texture* pTex = new Texture(Graphics::Get());
+    Texture* pTex = new Texture();
     if (false == pTex->Load(fileName))
     {
         delete pTex;
@@ -73,5 +73,5 @@ Texture* Texture::StaticLoad(const WCHAR* fileName, AssetManager* pManager)
 
 void Texture::SetActive(int slot) const
 {
-	mGraphics->SetActiveTexture(slot, mView);
+    Graphics::Get()->SetActiveTexture(slot, mView);
 }

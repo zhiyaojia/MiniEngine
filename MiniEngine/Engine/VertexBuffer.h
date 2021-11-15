@@ -5,7 +5,8 @@ class Graphics;
 class VertexBuffer
 {
 public:
-    VertexBuffer(Graphics* graphics,
+    VertexBuffer
+	(
         const void* vertexData, uint32_t vertexCount, uint32_t vertexStride,
         const void* indexData, uint32_t indexCount, uint32_t indexStride
     );

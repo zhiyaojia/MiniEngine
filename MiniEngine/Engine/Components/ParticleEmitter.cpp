@@ -65,8 +65,7 @@ ParticleEmitter::ParticleEmitter(RenderObj* pObj)
 {
     // Each emitter has a vertex buffer it uses to render all the particles
     // that belong to this emitter.
-    Graphics* pGraphics = s_pAssetManager->GetGraphics();
-    mPartBuffer = pGraphics->CreateGraphicsBuffer(&mPartRender, sizeof(mPartRender),
+    mPartBuffer = Graphics::Get()->CreateGraphicsBuffer(&mPartRender, sizeof(mPartRender),
         D3D11_BIND_VERTEX_BUFFER, D3D11_CPU_ACCESS_WRITE, D3D11_USAGE_DYNAMIC);
 
     // we keep a list of all emitters for RenderAll()
@@ -241,7 +240,7 @@ void ParticleEmitter::Update(float deltaTime)
 // Call this after pGraphics has been initialized, but before creating any emitters.
 /*static*/ void ParticleEmitter::Init(Graphics* pGraphics, AssetManager* pAssetManager)
 {
-    static const VertexPosUV s_quad[] =
+    static const VertexFormat::VertexPosUV s_quad[] =
     {
         { Vector3(0.0f, -0.5f, -0.5f),	Vector2(0.0f, 1.0f) },
         { Vector3(0.0f,  0.5f, -0.5f),	Vector2(1.0f, 1.0f) },
@@ -284,7 +283,7 @@ void ParticleEmitter::Update(float deltaTime)
 // You can specify how many particles to emit with "numToEmit".
 void ParticleEmitter::Emit(uint32_t numToEmit)
 {
-    Matrix4 mat = mMatrix * mObj->mObjectData.c_modelToWorld;
+    Matrix4 mat = mMatrix * mObj->mObjectData.modelToWorld;
     while (numToEmit > 0 && mNumParticles < MAX_PARTICLES)
     {
         float ang = Math::TwoPi * (float)rand() / (float)RAND_MAX;
@@ -320,7 +319,7 @@ void ParticleEmitter::Render()
     s_pGraphics->SetBlendState(mBlend);
     s_pGraphics->UploadBuffer(mPartBuffer, &mPartRender, sizeof(mPartRender));
 
-    uint32_t strides[] = { sizeof(VertexPosUV), sizeof(PerParticleRenderData) };
+    uint32_t strides[] = { sizeof(VertexFormat::VertexPosUV), sizeof(PerParticleRenderData) };
     uint32_t offsets[] = { 0, 0 };
     ID3D11Buffer* bufferPointers[] = { s_pVertexBuffer, mPartBuffer };
     s_pGraphics->GetDeviceContext()->IASetVertexBuffers(0, 2, bufferPointers, strides, offsets);

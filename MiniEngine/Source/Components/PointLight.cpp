@@ -17,14 +17,12 @@ PointLight::~PointLight()
 
 void PointLight::LoadProperties(const rapidjson::Value& properties)
 {
-    GetVectorFromJSON(properties, "diffuseColor", mLight->diffuseColor);
-    GetVectorFromJSON(properties, "specularColor", mLight->specularColor);
-    GetFloatFromJSON(properties, "specularPower", mLight->specularPower);
-    GetFloatFromJSON(properties, "innerRadius", mLight->innerRadius);
-    GetFloatFromJSON(properties, "outerRadius", mLight->outerRadius);
+	GetVectorFromJSON(properties, "lightColor", mLight->lightColor);
+	GetFloatFromJSON(properties, "innerRadius", mLight->innerRadius);
+	GetFloatFromJSON(properties, "outerRadius", mLight->outerRadius);
 }
 
 void PointLight::Update(float deltaTime)
 {
-    mLight->position = mObj->mObjectData.c_modelToWorld.GetTranslation();
+    mLight->position = mObj->mObjectData.modelToWorld.GetTranslation();
 }

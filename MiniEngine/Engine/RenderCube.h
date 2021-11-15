@@ -9,7 +9,7 @@ class RenderCube :
     public RenderObj
 {
 public:
-    RenderCube(AssetManager* pAssetManager, const Shader* pShader, const Texture* pTex);
+    RenderCube(class Material* material);
     virtual ~RenderCube() override;
 };
 

@@ -22,7 +22,7 @@ Player::Player(Game* pGame, SkinnedObj* pObj)
     , mVel(Vector3::Zero)
     , mPrevAnimTime(0.0f)
 {
-	Matrix4 mat = mObj->mObjectData.c_modelToWorld;
+	Matrix4 mat = mObj->mObjectData.modelToWorld;
     mPos = mat.GetTranslation();
     Vector3 fwd = mat.GetXAxis();
 	mHeading = atan2f(fwd.y, fwd.x);
@@ -82,7 +82,7 @@ bool Player::CheckGround(float* groundHeight)
     Vector3 hitPoint;
     bool hit = mGame->GetPhysics()->RayCast(ray, &hitPoint);
     if (hit)
-        * groundHeight = hitPoint.z;
+        *groundHeight = hitPoint.z;
     return hit;
 }
 
@@ -177,6 +177,6 @@ void Player::UpdateState(float deltaTime)
     }
 
     mPos += mVel * deltaTime;
-    mObj->mObjectData.c_modelToWorld = mat
+    mObj->mObjectData.modelToWorld = mat
         * Matrix4::CreateTranslation(mPos);
 }

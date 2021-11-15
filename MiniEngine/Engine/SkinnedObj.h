@@ -1,7 +1,6 @@
 #pragma once
 #include "RenderObj.h"
 
-
 #define MAX_SKELETON_BONES 80
 
 class SkinnedObj : public RenderObj
@@ -12,7 +11,7 @@ public:
         Matrix4 c_skinMatrix[MAX_SKELETON_BONES];
     };
     
-    SkinnedObj(Graphics* graphics, const Mesh* pMesh);
+    SkinnedObj(const Mesh* pMesh);
     ~SkinnedObj() override;
     void Draw() override;
 

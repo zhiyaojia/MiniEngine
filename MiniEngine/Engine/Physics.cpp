@@ -12,13 +12,12 @@
     overlap.mMax.x = min(a.mMax.x, b.mMax.x);
     overlap.mMax.y = min(a.mMax.y, b.mMax.y);
     overlap.mMax.z = min(a.mMax.z, b.mMax.z);
-    if ((overlap.mMax.x >= overlap.mMin.x)
-        && (overlap.mMax.y >= overlap.mMin.y)
-        && (overlap.mMax.z >= overlap.mMin.z)
-        )
+    if (overlap.mMax.x >= overlap.mMin.x && overlap.mMax.y >= overlap.mMin.y && overlap.mMax.z >= overlap.mMin.z)
     {
         if (nullptr != pOverlap)
-            * pOverlap = overlap;
+        {
+            *pOverlap = overlap;
+        }
         return true;
     }
     return false;
@@ -26,7 +25,7 @@
 
 /*static*/ bool Physics::Intersect(const LineSegment& segment, const AABB& box, Vector3* pHitPoint)
 {
-    static const float s_closeEnuf = 0.001f;
+    static constexpr float s_closeEnuf = 0.001f;
     Vector3 d = segment.mTo - segment.mFrom;
     float tmin = -FLT_MAX; // set to -FLT_MAX to get first hit on line
     float tmax = FLT_MAX; // set to max distance ray can travel (for segment)

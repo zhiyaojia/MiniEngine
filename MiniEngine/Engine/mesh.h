@@ -1,7 +1,6 @@
 #pragma once
-
-#include "engineMath.h"
 #include "Graphics.h"
+#include "Material.h"
 
 class AssetManager;
 class Shader;
@@ -11,20 +10,17 @@ class VertexBuffer;
 class Mesh
 {
 public:
-	Mesh(AssetManager* pAssetManager, const VertexBuffer* pVertexBuffer, const Shader* pShader);
+	Mesh(const VertexBuffer* vertexBuffer, Material* material);
 	~Mesh();
 
 	void Draw() const;
-	void SetTexture(int slot, const Texture* texture);
 
-	bool Load(const WCHAR* fileName);
+	bool Load(const WCHAR* fileName, AssetManager* pAssetManager);
     bool IsSkinned() const { return mIsSkin; }
 	static Mesh* StaticLoad(const WCHAR* fileName, AssetManager* pAssetManager);
 
 protected:
-    AssetManager* mAssetManager;
-    const Shader* mShader;
-    const VertexBuffer* mVertexBuffer;
-    const Texture* mTexture[Graphics::TEXTURE_SLOT_TOTAL];
+	Material* mMaterial;
+	const VertexBuffer* mVertexBuffer;
     bool mIsSkin;
 };

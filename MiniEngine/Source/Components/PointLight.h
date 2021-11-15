@@ -12,5 +12,5 @@ public:
 
 private:
     Game* mGame;
-    Game::PointLightData* mLight;
+    Light::PointLightData* mLight;
 };

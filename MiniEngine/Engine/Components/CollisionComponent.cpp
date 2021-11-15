@@ -25,8 +25,8 @@ void CollisionComponent::LoadProperties(const rapidjson::Value& properties)
 Physics::AABB CollisionComponent::GetAABB() const
 {
     Physics::AABB aabb = mAABB;
-    float scale = this->mObj->mObjectData.c_modelToWorld.GetScale().x;
-    Vector3 pos = mObj->mObjectData.c_modelToWorld.GetTranslation();
+    float scale = this->mObj->mObjectData.modelToWorld.GetScale().x;
+    Vector3 pos = mObj->mObjectData.modelToWorld.GetTranslation();
     aabb.mMin *= scale;
     aabb.mMax *= scale;
     aabb.mMin += pos;

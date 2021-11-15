@@ -28,11 +28,11 @@
     <ClCompile Include="ComputeShader.cpp" />
     <ClCompile Include="DbgAssert.cpp" />
     <ClCompile Include="engineMath.cpp" />
-    <ClCompile Include="engineMath_UnitTest.cpp" />
     <ClCompile Include="engineMemory.cpp" />
     <ClCompile Include="Graphics.cpp" />
     <ClCompile Include="Job.cpp" />
     <ClCompile Include="jsonUtil.cpp" />
+    <ClCompile Include="Material.cpp" />
     <ClCompile Include="mesh.cpp" />
     <ClCompile Include="Physics.cpp" />
     <ClCompile Include="Profiler.cpp" />
@@ -40,7 +40,6 @@
     <ClCompile Include="RenderObj.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="simdMath.cpp" />
-    <ClCompile Include="simdMath_UnitTest.cpp" />
     <ClCompile Include="Skeleton.cpp" />
     <ClCompile Include="SkinnedObj.cpp" />
     <ClCompile Include="stdafx.cpp">
@@ -69,6 +68,8 @@
     <ClInclude Include="Graphics.h" />
     <ClInclude Include="Job.h" />
     <ClInclude Include="jsonUtil.h" />
+    <ClInclude Include="Light.h" />
+    <ClInclude Include="Material.h" />
     <ClInclude Include="mesh.h" />
     <ClInclude Include="Physics.h" />
     <ClInclude Include="Profiler.h" />

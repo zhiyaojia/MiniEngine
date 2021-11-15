@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "Resource.h"
 #include "Game.h"
+#include "Test.h"
 #include "Profiler.h"
 
 #define WINDOW_WIDTH    800

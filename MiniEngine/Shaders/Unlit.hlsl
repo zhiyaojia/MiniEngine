@@ -3,34 +3,38 @@
 struct VIn
 {
     float3 position : POSITION0;
-    float3 normal : NORMAL0;
-    float2 uv : TEXCOORD0;
+    float3 Normal : NORMAL;
+    float2 TextureUV : TEXCOORD0;
 };
 
 struct VOut
 {
     float4 position : SV_POSITION;
-    float4 worldPos : POSITION1;
-    float3 normal : NORMAL0;
-    float2 uv : TEXCOORD0;
+    float3 Normal : NORMAL;
+    float2 TextureUV : TEXCOORD0;
+    float3 WorldPos : WorldPos;
 };
 
 VOut VS(VIn vIn)
 {
     VOut output;
 
-    float4 pos = float4(vIn.position, 1.0);
-    output.worldPos = mul(pos, c_modelToWorld);
-    output.position = mul(output.worldPos, c_viewProj);
-    float4 norm = float4(vIn.normal, 0.0);
-    output.normal = mul(norm, c_modelToWorld).xyz;
-    output.uv = vIn.uv;
+    // transform input position from model to world space
+    output.position = mul(float4(vIn.position, 1.0), c_modelToWorld);
+    output.WorldPos = float3(output.position.x, output.position.y, output.position.z);
+    // transform position from world to projection space
+    output.position = mul(output.position, c_viewProj);
+
+    output.TextureUV = vIn.TextureUV;
+
+    output.Normal = normalize(mul(float4(vIn.Normal, 0.0), c_modelToWorld));
 
     return output;
 }
 
 float4 PS(VOut pIn) : SV_TARGET
 {
-    float4 diffuseTex = DiffuseTexture.Sample(DefaultSampler, pIn.uv);
-    return diffuseTex;
+    float4 diffuse = DiffuseTexture.Sample(DefaultSampler, pIn.TextureUV);
+
+    return diffuse;
 }

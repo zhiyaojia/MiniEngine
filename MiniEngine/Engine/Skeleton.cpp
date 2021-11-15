@@ -1,11 +1,12 @@
 #include "stdafx.h"
 #include "Skeleton.h"
-#include "DbgAssert.h"
+
 #include "rapidjson\include\rapidjson\rapidjson.h"
 #include "rapidjson\include\rapidjson\document.h"
 #include <fstream>
 #include <sstream>
 
+size_t Skeleton::MAX_SKELETON_BONES = 80;
 
 Skeleton::Skeleton()
 {
@@ -13,17 +14,19 @@ Skeleton::Skeleton()
 
 void Skeleton::ComputeGlobalInvBindPose()
 {
-    mGlobalInvBindPoses.resize(mBones.size());
+    mGlobalInverseBindPoses.resize(mBones.size());
     for (int i = 0; i < mBones.size(); ++i)
     {
         const Bone& bone = mBones[i];
-        Matrix4 mat = bone.mLocalBindPose.ToMatrix();
+        Matrix4 mat = bone.mLocalTransform.ToMatrix();
         if (bone.mParent >= 0)
-            mGlobalInvBindPoses[i] = mat * mGlobalInvBindPoses[bone.mParent];
+        {
+            mGlobalInverseBindPoses[i] = mat * mGlobalInverseBindPoses[bone.mParent];
+        }
     }
     for (int i = 0; i < mBones.size(); ++i)
     {
-        mGlobalInvBindPoses[i].Invert();
+        mGlobalInverseBindPoses[i].Invert();
     }
 }
 
@@ -69,15 +72,15 @@ bool Skeleton::Load(const WCHAR* fileName)
         return false;
     }
 
-    const rapidjson::Value& bonecount = doc["bonecount"];
-    if (!bonecount.IsUint())
+    const rapidjson::Value& boneCount = doc["bonecount"];
+    if (!boneCount.IsUint())
     {
         return false;
     }
 
-    size_t count = bonecount.GetUint();
+    size_t count = boneCount.GetUint();
 
-//    DbgAssert(count <= Skeleton::MAX_SKELETON_BONES, "Skeleton exceeds maximum allowed bones.");
+    DbgAssert(count <= Skeleton::MAX_SKELETON_BONES, "Skeleton exceeds maximum allowed bones.");
 
     mBones.reserve(count);
 
@@ -121,14 +124,14 @@ bool Skeleton::Load(const WCHAR* fileName)
             return false;
         }
 
-        temp.mLocalBindPose.mRotation.x = rot[0].GetDouble();
-        temp.mLocalBindPose.mRotation.y = rot[1].GetDouble();
-        temp.mLocalBindPose.mRotation.z = rot[2].GetDouble();
-        temp.mLocalBindPose.mRotation.w = rot[3].GetDouble();
+        temp.mLocalTransform.mRotation.x = static_cast<float>(rot[0].GetDouble());
+        temp.mLocalTransform.mRotation.y = static_cast<float>(rot[1].GetDouble());
+        temp.mLocalTransform.mRotation.z = static_cast<float>(rot[2].GetDouble());
+        temp.mLocalTransform.mRotation.w = static_cast<float>(rot[3].GetDouble());
 
-        temp.mLocalBindPose.mTranslation.x = trans[0].GetDouble();
-        temp.mLocalBindPose.mTranslation.y = trans[1].GetDouble();
-        temp.mLocalBindPose.mTranslation.z = trans[2].GetDouble();
+        temp.mLocalTransform.mTranslation.x = static_cast<float>(trans[0].GetDouble());
+        temp.mLocalTransform.mTranslation.y = static_cast<float>(trans[1].GetDouble());
+        temp.mLocalTransform.mTranslation.z = static_cast<float>(trans[2].GetDouble());
 
         mBones.push_back(temp);
     }

@@ -3,7 +3,8 @@
 #include "mesh.h"
 #include "Shader.h"
 #include "Skeleton.h"
-#include "Texture.h"
+#include "texture.h"
+#include "Material.h"
 #include "assetCache.h"
 
 class Graphics;
@@ -11,31 +12,34 @@ class Graphics;
 class AssetManager
 {
 public:
-    AssetManager(Graphics* pGraphics);
+    AssetManager();
     ~AssetManager();
 
-    void Clear();
+    void Clear() const;
 
-    Graphics* GetGraphics() { return mGraphics; }
+    Shader* GetShader(const std::wstring& shaderName) const { return mShaderCache->Get(shaderName); }
+    void SetShader(const std::wstring& shaderName, Shader* pShader) const
+    {
+        pShader->SetName(shaderName);
+	    mShaderCache->Cache(shaderName, pShader);
+    }
 
-    Shader* GetShader(const std::wstring& shaderName) { return mShaderCache.Get(shaderName); }
-    void SetShader(const std::wstring& shaderName, Shader* pShader) { mShaderCache.Cache(shaderName, pShader); }
+    Texture* LoadTexture(const std::wstring& fileName) const { return mTextureCache->Load(fileName); }
 
-    Texture* LoadTexture(const std::wstring& fileName) { return mTextureCache.Load(fileName); }
+    Material* LoadMaterial(const std::wstring& materialName) const { return mMaterialCache->Load(materialName); }
 
-    Mesh* GetMesh(const std::wstring& meshName) { return mMeshCache.Get(meshName); }
-    void SetMesh(const std::wstring& meshName, Mesh* pMesh) { mMeshCache.Cache(meshName, pMesh); }
-    Mesh* LoadMesh(const std::wstring& fileName) { return mMeshCache.Load(fileName); }
+    Mesh* GetMesh(const std::wstring& meshName) const { return mMeshCache->Get(meshName); }
+    void SetMesh(const std::wstring& meshName, Mesh* pMesh) const { mMeshCache->Cache(meshName, pMesh); }
+    Mesh* LoadMesh(const std::wstring& fileName) const { return mMeshCache->Load(fileName); }
 
-    Skeleton* LoadSkeleton(const std::wstring& fileName) { return mSkeletonCache.Load(fileName); }
-    Animation* LoadAnimation(const std::wstring& fileName) { return mAnimCache.Load(fileName); }
+    Skeleton* LoadSkeleton(const std::wstring& fileName) const { return mSkeletonCache->Load(fileName); }
+    Animation* LoadAnimation(const std::wstring& fileName) const { return mAnimCache->Load(fileName); }
 
 private:
-    Graphics* mGraphics;
-
-    AssetCache<Shader> mShaderCache;
-    AssetCache<Texture> mTextureCache;
-    AssetCache<Mesh> mMeshCache;
-    AssetCache<Skeleton> mSkeletonCache;
-    AssetCache<Animation> mAnimCache;
+    AssetCache<Shader>* mShaderCache;
+    AssetCache<Texture>* mTextureCache;
+    AssetCache<Material>* mMaterialCache;
+    AssetCache<Mesh>* mMeshCache;
+    AssetCache<Skeleton>* mSkeletonCache;
+    AssetCache<Animation>* mAnimCache;
 };

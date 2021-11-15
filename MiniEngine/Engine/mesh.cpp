@@ -1,22 +1,13 @@
 #include "stdafx.h"
 #include "mesh.h"
 #include "assetManager.h"
-#include "Shader.h"
 #include "stringUtil.h"
-#include "texture.h"
-#include "vertexBuffer.h"
-#include "rapidjson\include\rapidjson\rapidjson.h"
-#include "rapidjson\include\rapidjson\document.h"
+#include "VertexBuffer.h"
 #include <fstream>
 #include <sstream>
+#include "jsonUtil.h"
 
-
-Mesh::Mesh(AssetManager* pAssetManager, const VertexBuffer* pVertexBuffer, const Shader* pShader)
-    : mAssetManager(pAssetManager)
-    , mShader(pShader)
-    , mVertexBuffer(pVertexBuffer)
-    , mTexture{nullptr}
-    , mIsSkin(false)
+Mesh::Mesh(const VertexBuffer* vertexBuffer, Material* material): mMaterial(material), mVertexBuffer(vertexBuffer), mIsSkin(false)
 {
 }
 
@@ -27,26 +18,17 @@ Mesh::~Mesh()
 
 void Mesh::Draw() const
 {
-    Graphics* pGraphics = mAssetManager->GetGraphics();
-    mShader->SetActive();
-    for (int i = 0; i < ARRAY_SIZE(mTexture); ++i)
+	if(mMaterial)
+	{
+		mMaterial->SetActive();
+	}
+    if(mVertexBuffer)
     {
-        if (nullptr == mTexture[i])
-            pGraphics->SetActiveTexture(i, nullptr);
-        else
-            mTexture[i]->SetActive(i);
+		mVertexBuffer->SetActive();
+		mVertexBuffer->Draw();
     }
-    mVertexBuffer->SetActive();
-    mVertexBuffer->Draw();
 }
-
-void Mesh::SetTexture(int slot, const Texture* texture)
-{
-    DbgAssert(slot >= 0 && slot < ARRAY_SIZE(mTexture), "Invalid Texture Slot");
-    mTexture[slot] = texture;
-}
-
-bool Mesh::Load(const WCHAR* fileName)
+bool Mesh::Load(const WCHAR* fileName, AssetManager* pAssetManager)
 {
 	std::ifstream file(fileName);
 	if (!file.is_open())
@@ -63,6 +45,7 @@ bool Mesh::Load(const WCHAR* fileName)
 
 	if (!doc.IsObject())
 	{
+		DbgAssert(false, "Unable to open Mesh file");
 		return false;
 	}
 
@@ -72,43 +55,36 @@ bool Mesh::Load(const WCHAR* fileName)
 	// Check the metadata
 	if (!doc["metadata"].IsObject() ||
 		str != "itpmesh" ||
-		ver != 2)
+		ver != 3)
 	{
+		DbgAssert(false, "Mesh File Incorrect Version");
 		return false;
 	}
 
-	// Load textures
-	const rapidjson::Value& textures = doc["textures"];
-	if (!textures.IsArray() || textures.Size() < 1)
-	{
-		return false;
-	}
+	// Check if it's a skinned mesh
+	GetBoolFromJSON(doc, "skinned", mIsSkin);
 
-	for (rapidjson::SizeType i = 0; i < textures.Size(); i++)
-	{
-		if (i < Graphics::TEXTURE_SLOT_TOTAL)
-		{
-			std::wstring textureName;
-			StringUtil::String2WString(textureName, textures[i].GetString());
-			mTexture[i] = mAssetManager->LoadTexture(textureName);
-		}
-	}
+	// Load Material
+	std::wstring matName;
+	GetWStringFromJSON(doc, "material", matName);
+	mMaterial = pAssetManager->LoadMaterial(matName);
 
 	// Read the vertex format
 	const rapidjson::Value& vertFormat = doc["vertexformat"];
 	if (!vertFormat.IsArray() || vertFormat.Size() < 1)
 	{
+		DbgAssert(false, "Mesh File Invalid Vertex Format");
 		return false;
 	}
 
 	uint32_t vertSize = 0;
 	uint32_t vertNumValues = 0;
 	std::string inputLayoutName;
-
 	for (rapidjson::SizeType i = 0; i < vertFormat.Size(); i++)
 	{
 		if (!vertFormat[i].IsObject())
 		{
+			DbgAssert(false, "Mesh File Invalid Vertex Format");
 			return false;
 		}
 
@@ -117,13 +93,9 @@ bool Mesh::Load(const WCHAR* fileName)
 		std::string vertType = vertFormat[i]["type"].GetString();
 		uint32_t elementSize = 0;
 		if (vertType == "float")
-		{
 			elementSize = 4;
-		}
 		else
-		{
 			elementSize = 1;
-		}
 
 		vertNumValues += vertFormat[i]["count"].GetUint();
 		vertSize += elementSize * vertFormat[i]["count"].GetUint();
@@ -131,19 +103,15 @@ bool Mesh::Load(const WCHAR* fileName)
 
 	if (vertNumValues < 3)
 	{
+		DbgAssert(false, "Mesh File Invalid Vertex Format");
 		return false;
 	}
-
-	// Get the shader type
-	std::wstring shaderName;
-	StringUtil::String2WString(shaderName, doc["shader"]["name"].GetString());
-	mShader = mAssetManager->GetShader(shaderName);
-    DbgAssert(nullptr != mShader, "Unable to load shader");
 
 	// Load in the vertices
 	const rapidjson::Value& vertsJson = doc["vertices"];
 	if (!vertsJson.IsArray() || vertsJson.Size() < 1)
 	{
+		DbgAssert(false, "Mesh File Invalid Vertex Format");
 		return false;
 	}
 
@@ -152,9 +120,7 @@ bool Mesh::Load(const WCHAR* fileName)
 		float f;
 		uint8_t b[4];
 	};
-
-    mIsSkin = (L"Skinned" == shaderName);
-	size_t numVerts = vertsJson.Size();
+	uint32_t numVerts = vertsJson.Size();
 	std::vector<VertPacked> vertices;
 	vertices.reserve(numVerts * vertSize);
 	for (rapidjson::SizeType i = 0; i < vertsJson.Size(); i++)
@@ -162,6 +128,7 @@ bool Mesh::Load(const WCHAR* fileName)
 		const rapidjson::Value& vert = vertsJson[i];
 		if (!vert.IsArray() || vert.Size() != vertNumValues)
 		{
+			DbgAssert(false, "Mesh File Invalid Vertex Format");
 			return false;
 		}
 
@@ -208,16 +175,18 @@ bool Mesh::Load(const WCHAR* fileName)
 	const rapidjson::Value& indJson = doc["indices"];
 	if (!indJson.IsArray() || indJson.Size() < 1)
 	{
+		DbgAssert(false, "Mesh File Invalid Index Format");
 		return false;
 	}
 
 	std::vector<uint16_t> indices;
-	indices.reserve((size_t)indJson.Size() * 3);
+	indices.reserve(indJson.Size() * 3);
 	for (rapidjson::SizeType i = 0; i < indJson.Size(); i++)
 	{
 		const rapidjson::Value& ind = indJson[i];
 		if (!ind.IsArray() || ind.Size() != 3)
 		{
+			DbgAssert(false, "Mesh File Invalid Index Format");
 			return false;
 		}
 
@@ -227,17 +196,18 @@ bool Mesh::Load(const WCHAR* fileName)
 	}
 
 	// Now create a vertex array
-	mVertexBuffer = new VertexBuffer(mAssetManager->GetGraphics(),
-		vertices.data(), (uint32_t)numVerts, vertSize,
+	mVertexBuffer = new VertexBuffer(
+		vertices.data(), numVerts, vertSize,
 		indices.data(), (uint32_t)indices.size(), sizeof(uint16_t)
-		);
-	return true;
+	);
+
+	return true;	// everything went fine
 }
 
 Mesh* Mesh::StaticLoad(const WCHAR* fileName, AssetManager* pAssetManager)
 {
-	Mesh *pMesh = new Mesh(pAssetManager, nullptr, nullptr);
-	if (false == pMesh->Load(fileName))
+	Mesh* pMesh = new Mesh(nullptr, nullptr);
+	if (false == pMesh->Load(fileName, pAssetManager))
 	{
 		delete pMesh;
 		return nullptr;

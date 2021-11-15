@@ -3,8 +3,8 @@
 
 BoneTransform BoneTransform::Interpolate(const BoneTransform& a, const BoneTransform& b, float f)
 {
-    BoneTransform xform;
-    xform.mRotation = Slerp(a.mRotation, b.mRotation, f);
-    xform.mTranslation = Lerp(a.mTranslation, b.mTranslation, f);
-    return xform;
+    BoneTransform lerpTransform;
+    lerpTransform.mRotation = Slerp(a.mRotation, b.mRotation, f);
+    lerpTransform.mTranslation = Lerp(a.mTranslation, b.mTranslation, f);
+    return lerpTransform;
 }

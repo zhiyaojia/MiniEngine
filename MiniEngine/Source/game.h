@@ -3,6 +3,7 @@
 #include "Graphics.h"
 #include "Job.h"
 #include "Physics.h"
+#include "Light.h"
 
 class Camera;
 class RenderObj;
@@ -12,56 +13,6 @@ class Texture;
 class Game
 {
 public:
-    enum { MAX_POINT_LIGHTS = 8 };
-    struct PointLightData
-    {
-        PointLightData()
-        {
-            diffuseColor = Vector3::Zero;
-            pad0 = 0.0f;
-
-            specularColor = Vector3::Zero;
-            pad1 = 0.0f;
-
-            position = Vector3::Zero;
-            specularPower = 0.0f;
-
-            innerRadius = 0.0f;
-            outerRadius = 0.0f;
-            isEnabled = 0.0f;
-            pad2 = 0.0f;
-            pad3 = 0.0f;
-            pad4 = 0.0f;
-            pad5 = 0.0f;
-        }
-        Vector3 diffuseColor;
-        float pad0;
-
-        Vector3 specularColor;
-        float pad1;
-
-        Vector3 position;
-        float specularPower;
-
-        float innerRadius;
-        float outerRadius;
-        bool isEnabled;
-        bool pad2, pad3, pad4;
-        float pad5;
-    };
-
-    struct LightingConstants
-    {
-        LightingConstants()
-        {
-            c_ambient = Vector3::Zero;
-            pad0 = 0.0f;
-        }
-        Vector3	c_ambient;
-        float pad0;
-        PointLightData c_pointLight[MAX_POINT_LIGHTS];
-    };
-
     Game();
     ~Game();
 
@@ -74,13 +25,12 @@ public:
 	void OnKeyUp(uint32_t key);
 	bool IsKeyHeld(uint32_t key) const;
 
-    // Lighting Access
-    PointLightData* AllocateLight();
-    void FreeLight(PointLightData* pLight);
-    void SetAmbientLight(const Vector3& color) { mLightData.c_ambient = color;  }
-    const Vector3& GetAmbientLight() const { return mLightData.c_ambient;  }
+    Light::PointLightData* AllocateLight();
+    void FreeLight(Light::PointLightData* pLight);
+    void SetAmbientLight(const Vector3& color);
+    const Vector3& GetAmbientLight() const;
 
-    AssetManager* GetAssetManager() { return &mAssets; }
+    AssetManager* GetAssetManager() { return &mAssetManager; }
 
     void AddJob(JobManager::Job* pJob) { mJobs.AddJob(pJob); }
 
@@ -89,18 +39,18 @@ public:
 
 private:
 	std::unordered_map<uint32_t, bool> m_keyIsHeld;
-    Graphics mGraphics;
+    Graphics mGraphic;
     JobManager mJobs;
     Physics mPhysics;
 
     Camera* mCamera;
-    AssetManager mAssets;
+    AssetManager mAssetManager;
 
     std::vector<RenderObj*> mRenderObj;
 
     // lighting data
-    LightingConstants mLightData;
-    ID3D11Buffer* mLightBuffer;
+    Light::LightingConstant mLightData;
+    ID3D11Buffer* mLightBuffer = nullptr;
 
 	bool LoadLevel(const WCHAR* fileName);
 };

@@ -8,8 +8,8 @@
 
 
 Animation::Animation()
-    : mNumBones(0)
-    , mNumFrames(0)
+    : mBoneNum(0)
+    , mFrameNum(0)
     , mLength(0.0f)
 {
 }
@@ -71,11 +71,11 @@ bool Animation::Load(const WCHAR* fileName)
         return false;
     }
 
-    mNumFrames = frames.GetUint();
+    mFrameNum = frames.GetUint();
     mLength = length.GetDouble();
-    mNumBones = bonecount.GetUint();
+    mBoneNum = bonecount.GetUint();
 
-    mTracks.resize(mNumBones);
+    mTracks.resize(mBoneNum);
 
     const rapidjson::Value& tracks = sequence["tracks"];
 
@@ -101,7 +101,7 @@ bool Animation::Load(const WCHAR* fileName)
 
         BoneTransform temp;
 
-        if (transforms.Size() != mNumFrames)
+        if (transforms.Size() != mFrameNum)
         {
             return false;
         }
@@ -139,31 +139,38 @@ void Animation::GetGlobalPoseAtTime(std::vector<Matrix4>& outPoses, const Skelet
     float lerp = 0.0f;
     if (inTime > mLength)
     {
-        fromKey = mNumFrames - 1;
+        fromKey = static_cast<int>(mFrameNum) - 1;
         toKey = fromKey;
     }
     else if (inTime > 0.0f)
     {
-        float timePerFrame = mLength / (mNumFrames - 1);
-        float frac = inTime / timePerFrame;
-        fromKey = (int)frac;
+        const float timePerFrame = mLength / static_cast<float>((mFrameNum - 1));
+        const float fraction = inTime / timePerFrame;
+        fromKey = static_cast<int>(fraction);
         toKey = fromKey + 1;
-        lerp = frac - fromKey;
+        lerp = fraction - static_cast<float>(fromKey);
     }
 
-    size_t numBones = inSkeleton->GetNumBones();
+    const size_t numBones = inSkeleton->GetNumBones();
     outPoses.resize(numBones);
+
+    DbgAssert(mTracks.empty() == false, "Animation track is empty");
+
     for (size_t i = 0; i < numBones; ++i)
     {
         const Skeleton::Bone& bone = inSkeleton->GetBone(i);
         if (mTracks[i].size() > 0)
         {
-            BoneTransform xform = BoneTransform::Interpolate(mTracks[i][fromKey], mTracks[i][toKey], lerp);
-            outPoses[i] = xform.ToMatrix();
+            BoneTransform lerpTransform = BoneTransform::Interpolate(mTracks[i][fromKey], mTracks[i][toKey], lerp);
+            outPoses[i] = lerpTransform.ToMatrix();
         }
-        else
+        else // Some bones have no animation on them
+        {
             outPoses[i] = Matrix4::Identity;
+        }
         if (bone.mParent >= 0)
+        {
             outPoses[i] = outPoses[i] * outPoses[bone.mParent];
+        }
     }
 }

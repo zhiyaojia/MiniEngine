@@ -3,14 +3,13 @@
 
 #pragma once
 
-
 #define ARRAY_SIZE(x) (sizeof(x)/sizeof(x[0]))
 
 namespace Math
 {
-    const float Pi = 3.1415926535f;
-    const float TwoPi = Pi * 2.0f;
-    const float PiOver2 = Pi / 2.0f;
+    constexpr float Pi = 3.1415926535f;
+    constexpr float TwoPi = Pi * 2.0f;
+    constexpr float PiOver2 = Pi / 2.0f;
 
     inline float ToRadians(float degrees)
     {
@@ -40,6 +39,11 @@ namespace Math
         return Min(upper, Max(lower, value));
     }
 
+    inline float Clamp01(const float& value)
+    {
+        return Min(1.0f, Max(0.0f, value));
+    }
+
     inline float Lerp(float a, float b, float f)
     {
         return a + f * (b - a);
@@ -50,14 +54,7 @@ namespace Math
     //----------------------------------------------------------------------------------------
     inline bool IsZero(float val, float epsilon = 0.001f)
     {
-        if (fabs(val) <= epsilon)
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
+        return fabs(val) <= epsilon;
     }
 
     //----------------------------------------------------------------------------------------
@@ -181,7 +178,7 @@ public:
     // Normalize this vector
     void Normalize()
     {
-        float length = Length();
+        const float length = Length();
         x /= length;
         y /= length;
     }
@@ -203,16 +200,15 @@ public:
     // Lerp from A to B by f
     static Vector2 Lerp(const Vector2& a, const Vector2& b, float f)
     {
-        return Vector2(a + f * (b - a));
+        return a + f * (b - a);
     }
 
     static const Vector2 Zero;
     static const Vector2 One;
     static const Vector2 UnitX;
     static const Vector2 UnitY;
-
-    static bool UnitTest();
 };
+
 
 // 3D Vector
 class Vector3
